@@ -26,6 +26,19 @@ server.addService(inventoryProto.InventoryService.service, {
             products.find((product) => product.id == payload.request.id)
         );
     },
+    SearchProductByIdAndAddQuantity: (payload, callback) => {
+        products.forEach(p => {
+            if (p.id == payload.request.id) {
+                if (payload.request.quantity > 0) {
+                    p.quantity = payload.request.quantity
+                }
+            }
+        });
+        callback(
+            null,
+            {id: payload.request.id, quantity: payload.request.quantity}
+        );
+    },
 });
 
 server.bindAsync('127.0.0.1:3002', grpc.ServerCredentials.createInsecure(), () => {

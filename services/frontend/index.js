@@ -16,7 +16,7 @@ function newBook(book) {
                 <div class="content book" data-id="${book.id}">
                     <div class="book-meta">
                         <p class="is-size-4">R$${book.price.toFixed(2)}</p>
-                        <p class="is-size-6">Disponível em estoque: 5</p>
+                        <p class="is-size-6">Disponível em estoque: ${book.quantity}</p>
                         <h4 class="is-size-3 title">${book.name}</h4>
                         <p class="subtitle">${book.author}</p>
                     </div>
@@ -28,7 +28,7 @@ function newBook(book) {
                             <a class="button button-shipping is-info" data-id="${book.id}"> Calcular Frete </a>
                         </div>
                     </div>
-                    <button class="button button-buy is-success is-fullwidth">Comprar</button>
+                    <button class="button button-buy is-success is-fullwidth" data-id="${book.id}">Comprar</button>
                 </div>
             </div>
         </div>`;
@@ -48,6 +48,28 @@ function calculateShipping(id, cep) {
         })
         .catch((err) => {
             swal('Erro', 'Erro ao consultar frete', 'error');
+            console.error(err);
+        });
+}
+
+/* TODO */
+function buyProduct(id) {
+    fetch('http://localhost:3000/product/' + id)
+        .then((data) => {
+            if (data.ok) {
+                return data.json();
+            }
+            throw data.statusText;
+        })
+        .then((data) => {
+            if (data['quantity'] > 0) {
+                swal('Compra de livro', 'Sua compra foi realizada com sucesso', 'success');
+            } else {
+                swal('Produto indisponível', 'Não temos estoque para o item solicitado!', 'warning');
+            }
+        })
+        .catch((err) => {
+            swal('Erro', 'Não foi possível efetuar a compra', 'error');
             console.error(err);
         });
 }
@@ -78,7 +100,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 document.querySelectorAll('.button-buy').forEach((btn) => {
                     btn.addEventListener('click', (e) => {
-                        swal('Compra de livro', 'Sua compra foi realizada com sucesso', 'success');
+                        const id = e.target.getAttribute('data-id');
+                        buyProduct(id);
                     });
                 });
             }
