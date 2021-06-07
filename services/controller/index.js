@@ -53,6 +53,17 @@ app.get('/product/:id', (req, res, next) => {
     });
 });
 
+app.post('/product/:id', (req, res, next) => {
+    inventory.SearchProductByIdAndDecreaseQuantity({ id: req.params.id }, (err, product) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send({ error: 'something failed :(' });
+        } else {
+            res.json(product);
+        }
+    });
+});
+
 app.get('/stock', (req, res, next) => {
     inventory.SearchProductByIdAndAddQuantity({ quantity: req.query.quantity, id: req.query.id }, (err, product) => {
         if (err) {

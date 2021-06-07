@@ -16,7 +16,7 @@ function newBook(book) {
                 <div class="content book" data-id="${book.id}">
                     <div class="book-meta">
                         <p class="is-size-4">R$${book.price.toFixed(2)}</p>
-                        <p class="is-size-6">Disponível em estoque: ${book.quantity}</p>
+                        <p class="is-size-6">Disponível em estoque: <span id="quantity${book.id}">${book.quantity}</span></p>
                         <h4 class="is-size-3 title">${book.name}</h4>
                         <p class="subtitle">${book.author}</p>
                     </div>
@@ -52,26 +52,33 @@ function calculateShipping(id, cep) {
         });
 }
 
-/* TODO */
 function buyProduct(id) {
-    fetch('http://localhost:3000/product/' + id)
-        .then((data) => {
-            if (data.ok) {
-                return data.json();
-            }
-            throw data.statusText;
-        })
-        .then((data) => {
-            if (data['quantity'] > 0) {
-                swal('Compra de livro', 'Sua compra foi realizada com sucesso', 'success');
-            } else {
-                swal('Produto indisponível', 'Não temos estoque para o item solicitado!', 'warning');
-            }
-        })
-        .catch((err) => {
-            swal('Erro', 'Não foi possível efetuar a compra', 'error');
-            console.error(err);
-        });
+    fetch('http://localhost:3000/product/' + id, {
+        method: 'POST', 
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({id: id})
+    })
+    .then((data) => {
+        if (data.ok) {
+            return data.json();
+        }
+        throw data.statusText;
+    })
+    .then((data) => {
+        document.getElementById("quantity" + data.id).innerHTML = data.quantity;
+        if (data['quantity'] > 0) {
+            swal('Compra de livro', 'Sua compra foi realizada com sucesso', 'success');
+        } else {
+            swal('Produto indisponível', 'Não temos estoque para o item solicitado!', 'warning');
+        }
+    })
+    .catch((err) => {
+        swal('Erro', 'Não foi possível efetuar a compra', 'error');
+        console.error(err);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function () {

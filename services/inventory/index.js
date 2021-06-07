@@ -20,7 +20,20 @@ server.addService(inventoryProto.InventoryService.service, {
             products: products,
         });
     },
-	    SearchProductByID: (payload, callback) => {
+	SearchProductByID: (payload, callback) => {
+        callback(
+            null,
+            products.find((product) => product.id == payload.request.id)
+        );
+    },
+    SearchProductByIdAndDecreaseQuantity : (payload, callback) => {
+        products.forEach(p => {
+            if (p.id == payload.request.id) {
+                if (p.quantity > 0) {
+                    p.quantity -= 1
+                }
+            }
+        });
         callback(
             null,
             products.find((product) => product.id == payload.request.id)
